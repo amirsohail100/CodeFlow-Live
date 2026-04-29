@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeFlow Live | Pro3</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.1.0/css/xterm.css">
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.1.0/lib/xterm.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.min.js"></script>
+</head>
+<body class="dark-theme"> 
+    <div class="repl-container">
+        <nav class="navbar">
+            <div class="nav-left">
+                <i data-lucide="layers" class="logo"></i>
+                <span class="project-name">Cloud-Editor-V5</span>
+            </div>
+            <div class="nav-center">
+                <button class="run-btn" onclick="executeCode()">
+                    <i data-lucide="play"></i> Run
+                </button>
+            </div>
+            <div class="nav-right">
+                <button onclick="togglePanel('preview-frame-container')" class="action-btn">
+                    <i data-lucide="layout"></i> Preview
+                </button>
+                <button onclick="togglePanel('terminal-pane')" class="action-btn">
+                    <i data-lucide="terminal"></i> Terminal
+                </button>
+                <button onclick="toggleTheme()" class="action-btn theme-btn">
+                    <i data-lucide="sun" id="theme-icon"></i>
+                </button>
+                <button onclick="downloadCurrentFile()" class="action-btn download-btn">
+                    <i data-lucide="download"></i> Download
+                </button>
+                <!-- <div class="user-avatar">M</div> -->
+            </div>
+        </nav>
+
+        <div class="repl-workspace">
+            <aside class="activity-bar">
+                <i data-lucide="files" id="toggle-sidebar" class="active-icon"></i>
+                <i data-lucide="search"></i>
+                <i data-lucide="settings"></i>
+            </aside>
+
+            <div class="sidebar" id="sidebar">
+                <div class="file-explorer">
+                    <header>
+                        <span>FILES</span>
+                        <i data-lucide="file-plus" class="add-btn" onclick="addNewFile()" title="New File"></i>
+                    </header>
+                    <div id="file-tree" class="tree"></div>
+                </div>
+            </div>
+
+            <div class="resizer horizontal" id="resizer-side"></div>
+
+            <main class="main-content">
+                <div class="top-row">
+                    <section class="editor-area">
+                        <div class="tab-bar">
+                            <div class="tab active">
+                                <span id="current-tab-name">No File Open</span>
+                            </div>
+                        </div>
+                        <div id="monaco-editor"></div>
+                    </section>
+                    
+                    <div class="resizer horizontal" id="resizer-main"></div>
+
+                    <section class="output-area" id="preview-frame-container">
+                        <div class="pane-header">WEBVIEW <i data-lucide="refresh-cw" onclick="executeCode()" class="refresh-icon"></i></div>
+                        <iframe id="preview-frame" sandbox="allow-scripts"></iframe>
+                    </section>
+                </div>
+
+                <div class="resizer vertical" id="resizer-term"></div>
+
+                <section class="terminal-pane" id="terminal-pane">
+                    <div class="pane-header">SHELL</div>
+                    <div id="terminal-container"></div>
+                </section>
+            </main>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
