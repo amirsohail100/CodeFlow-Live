@@ -1,34 +1,24 @@
 let editor, terminal, currentFilePath = "index.html";
 
-// Nested File System Tree State
+// Clean baseline file structure without unnecessary dummy folders/files
 let fileSystem = {
     "index.html": {
         type: "file",
-        content: "<!DOCTYPE html>\n<html>\n<head>\n  <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n  <h1>Hello, CodeFlow Live!</h1>\n  <script src=\"script.js\"></script>\n</body>\n</html>"
+        content: "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <link rel=\"stylesheet\" href=\"style.css\">\n  <title>CodeFlow Live App</title>\n</head>\n<body>\n  <div class=\"container\">\n    <h1>Hello, CodeFlow Live!</h1>\n    <p>Start editing your workspace in real-time.</p>\n  </div>\n  <script src=\"script.js\"></script>\n</body>\n</html>"
     },
     "style.css": {
         type: "file",
-        content: "body {\n  font-family: sans-serif;\n  background: #121826;\n  color: #00f2fe;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  height: 100vh;\n}"
+        content: "/* Clean Starter Styles */\n* {\n  box-sizing: border-box;\n  margin: 0;\n  padding: 0;\n}\n\nbody {\n  font-family: 'Inter', sans-serif;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  min-height: 100vh;\n  background-color: #f8fafc;\n  color: #0f172a;\n}\n\n.container {\n  text-align: center;\n  padding: 2.5rem;\n  border-radius: 12px;\n  background: #ffffff;\n  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);\n}\n\nh1 {\n  color: #2563eb;\n  margin-bottom: 0.5rem;\n}"
     },
     "script.js": {
         type: "file",
-        content: "console.log('CodeFlow Live Project Running...');"
-    },
-    "src": {
-        type: "folder",
-        expanded: true,
-        children: {
-            "utils.js": {
-                type: "file",
-                content: "// Helper functions\nfunction greet(name) {\n  return `Hello, ${name}!`;\n}"
-            }
-        }
+        content: "// Client-side script\nconsole.log('CodeFlow Live App Ready!');"
     }
 };
 
 // Virtual Shell State
 let termCommand = "";
-let currentShellPath = []; // Root
+let currentShellPath = [];
 
 // Initialize Monaco Editor
 require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs' }});
@@ -60,6 +50,7 @@ function initApp() {
     initInteractiveTerminal();
     setupResizers();
     renderTree();
+    refreshPreview();
     lucide.createIcons();
 
     const toggleBtn = document.getElementById('toggle-sidebar');
@@ -76,7 +67,36 @@ function initApp() {
 }
 
 /* ==========================================================================
-   File System Utilities (Nested Objects)
+   Panel Toggle Handlers (Preview & Terminal Buttons)
+   ========================================================================== */
+
+function togglePanel(panelId) {
+    const panel = document.getElementById(panelId);
+    const btnId = panelId === 'preview-frame-container' ? 'btn-preview' : 'btn-terminal';
+    const resizerId = panelId === 'preview-frame-container' ? 'resizer-main' : 'resizer-term';
+    
+    const btn = document.getElementById(btnId);
+    const resizer = document.getElementById(resizerId);
+
+    if (!panel) return;
+
+    const isHidden = window.getComputedStyle(panel).display === 'none';
+
+    if (isHidden) {
+        panel.style.display = 'flex';
+        if (btn) btn.classList.add('active');
+        if (resizer) resizer.style.display = 'block';
+    } else {
+        panel.style.display = 'none';
+        if (btn) btn.classList.remove('active');
+        if (resizer) resizer.style.display = 'none';
+    }
+
+    setTimeout(() => { if (editor) editor.layout(); }, 150);
+}
+
+/* ==========================================================================
+   File System Utilities
    ========================================================================== */
 
 function getItemByPath(pathStr) {
@@ -149,10 +169,12 @@ function renderTree() {
                         <i data-lucide="${iconName}"></i>
                         <span>${key}</span>
                     </div>
-                    <i data-lucide="trash-2" style="width:13px; opacity:0.6; cursor:pointer;" onclick="deleteTreeItem(event, '${fullPath}')" title="Delete"></i>
+                    <div class="tree-node-actions">
+                        <i data-lucide="trash-2" onclick="deleteTreeItem(event, '${fullPath}')" title="Delete File"></i>
+                    </div>
                 `;
                 nodeDiv.onclick = (e) => {
-                    if (!e.target.closest('[data-lucide="trash-2"]')) {
+                    if (!e.target.closest('.tree-node-actions')) {
                         switchFile(fullPath);
                     }
                 };
@@ -166,7 +188,11 @@ function renderTree() {
                         <i data-lucide="${item.expanded ? 'folder-open' : 'folder'}"></i>
                         <span style="font-weight:600;">${key}</span>
                     </div>
-                    <i data-lucide="trash-2" style="width:13px; opacity:0.6; cursor:pointer;" onclick="deleteTreeItem(event, '${fullPath}')" title="Delete Folder"></i>
+                    <div class="tree-node-actions">
+                        <i data-lucide="file-plus" onclick="addNewItemToPath(event, '${fullPath}', 'file')" title="New File inside ${key}"></i>
+                        <i data-lucide="folder-plus" onclick="addNewItemToPath(event, '${fullPath}', 'folder')" title="New Subfolder inside ${key}"></i>
+                        <i data-lucide="trash-2" onclick="deleteTreeItem(event, '${fullPath}')" title="Delete Folder"></i>
+                    </div>
                 `;
 
                 const childrenContainer = document.createElement('div');
@@ -175,7 +201,7 @@ function renderTree() {
                 childrenContainer.style.display = item.expanded ? 'flex' : 'none';
 
                 nodeDiv.onclick = (e) => {
-                    if (!e.target.closest('[data-lucide="trash-2"]')) {
+                    if (!e.target.closest('.tree-node-actions')) {
                         item.expanded = !item.expanded;
                         renderTree();
                     }
@@ -195,36 +221,46 @@ function renderTree() {
     lucide.createIcons();
 }
 
-function addNewItem(type) {
-    const inputName = prompt(`Enter ${type} name (e.g. ${type === 'file' ? 'index.html' : 'components'} or path like src/app.js):`);
+function addNewRootItem(type) {
+    const inputName = prompt(`Enter ${type} name for root directory:`);
     if (!inputName || !inputName.trim()) return;
 
     const trimmed = inputName.trim();
-    const parts = trimmed.split('/');
-    let current = fileSystem;
+    if (type === 'file') {
+        fileSystem[trimmed] = { type: 'file', content: `// ${trimmed}` };
+        renderTree();
+        switchFile(trimmed);
+    } else {
+        fileSystem[trimmed] = { type: 'folder', expanded: true, children: {} };
+        renderTree();
+    }
+}
 
-    for (let i = 0; i < parts.length; i++) {
-        const part = parts[i];
-        if (i === parts.length - 1) {
-            if (type === 'file') {
-                current[part] = { type: 'file', content: `// ${part}` };
-                renderTree();
-                switchFile(trimmed);
-            } else {
-                current[part] = { type: 'folder', expanded: true, children: {} };
-                renderTree();
-            }
+function addNewItemToPath(event, parentPath, type) {
+    if (event) event.stopPropagation();
+    const itemName = prompt(`Enter ${type} name inside '${parentPath}':`);
+    if (!itemName || !itemName.trim()) return;
+
+    const name = itemName.trim();
+    const targetFolder = getItemByPath(parentPath);
+
+    if (targetFolder && targetFolder.type === 'folder') {
+        targetFolder.expanded = true;
+        const fullItemPath = `${parentPath}/${name}`;
+
+        if (type === 'file') {
+            targetFolder.children[name] = { type: 'file', content: `// ${name}` };
+            renderTree();
+            switchFile(fullItemPath);
         } else {
-            if (!current[part]) {
-                current[part] = { type: 'folder', expanded: true, children: {} };
-            }
-            current = current[part].children;
+            targetFolder.children[name] = { type: 'folder', expanded: true, children: {} };
+            renderTree();
         }
     }
 }
 
 function deleteTreeItem(event, pathStr) {
-    event.stopPropagation();
+    if (event) event.stopPropagation();
     if (confirm(`Delete ${pathStr}?`)) {
         deleteItemByPath(pathStr);
         if (currentFilePath === pathStr) {
@@ -315,7 +351,7 @@ function initInteractiveTerminal() {
     const termContainer = document.getElementById('terminal-container');
     if (termContainer) {
         terminal.open(termContainer);
-        terminal.writeln('\x1b[34m=== CodeFlow Live v5.2 Interactive Shell ===\x1b[0m');
+        terminal.writeln('\x1b[34m=== CodeFlow Live v5.3 Interactive Shell ===\x1b[0m');
         terminal.writeln('Type \x1b[33mhelp\x1b[0m to list available terminal commands.\r\n');
         promptShell();
 
