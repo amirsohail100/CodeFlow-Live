@@ -184,6 +184,12 @@ body {
     color: var(--accent);
 }
 
+.action-btn.active {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
 .action-btn i {
     width: 15px;
     height: 15px;
@@ -344,6 +350,29 @@ body {
     white-space: nowrap;
 }
 
+.tree-node-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.tree-node:hover .tree-node-actions {
+    opacity: 1;
+}
+
+.tree-node-actions i {
+    width: 13px;
+    height: 13px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.tree-node-actions i:hover {
+    color: var(--accent);
+}
+
 .tree-node i {
     width: 15px;
     height: 15px;
@@ -436,7 +465,7 @@ body {
     width: 450px;
     display: flex;
     flex-direction: column;
-    background: #ffffff;
+    background: var(--bg-surface);
     border-left: 1px solid var(--border);
     min-width: 150px;
 }
