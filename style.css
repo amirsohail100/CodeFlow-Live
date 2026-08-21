@@ -417,7 +417,7 @@ body {
     min-width: 200px;
 }
 
-/* Tab Bar */
+/* Multi-Tab System Styling */
 .tab-bar {
     height: 38px;
     background: var(--bg-surface);
@@ -425,10 +425,15 @@ body {
     display: flex;
     align-items: center;
     overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.tab-bar::-webkit-scrollbar {
+    display: none;
 }
 
 .tab {
-    padding: 0 18px;
+    padding: 0 12px;
     height: 100%;
     display: flex;
     align-items: center;
@@ -439,19 +444,83 @@ body {
     border-right: 1px solid var(--border);
     border-top: 2px solid transparent;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.tab:hover {
+    background: var(--bg-side);
+    color: var(--text-primary);
 }
 
 .tab.active {
     background: var(--tab-active-bg);
-    color: var(--accent);
+    color: var(--text-primary);
     border-top-color: var(--accent);
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .tab-icon {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+}
+
+.tab-name {
+    font-size: 12px;
+}
+
+.tab-close {
     width: 14px;
     height: 14px;
+    padding: 2px;
+    border-radius: 4px;
+    opacity: 0.6;
+    transition: all 0.15s ease;
+}
+
+.tab-close:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.15);
+    color: #ef4444;
+}
+
+/* File Icon Extensions Accent Colors */
+.tab-icon.html-icon, .tree-node .html-icon { color: #e44d26 !important; }
+.tab-icon.css-icon, .tree-node .css-icon { color: #264de4 !important; }
+.tab-icon.js-icon, .tree-node .js-icon { color: #f7df1e !important; }
+.tab-icon.json-icon, .tree-node .json-icon { color: #00c7b7 !important; }
+.tab-icon.py-icon, .tree-node .py-icon { color: #3776ab !important; }
+.tab-icon.md-icon, .tree-node .md-icon { color: #0891b2 !important; }
+
+/* Breadcrumb Navigation Bar */
+.breadcrumb-bar {
+    height: 24px;
+    background: var(--bg-dark);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.bc-icon {
+    width: 13px;
+    height: 13px;
+    color: var(--accent);
+}
+
+.bc-item {
+    color: var(--text-secondary);
+}
+
+.bc-sep {
+    color: var(--border-light);
+    font-size: 10px;
 }
 
 #monaco-editor {
