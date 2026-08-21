@@ -30,7 +30,7 @@
                 </div>
                 <div class="project-info">
                     <span class="project-name">CodeFlow Live</span>
-                    <span class="version-badge">v5.2 Pro</span>
+                    <span class="version-badge">v5.3 Pro</span>
                 </div>
             </div>
 
@@ -42,11 +42,11 @@
             </div>
 
             <div class="nav-right">
-                <button onclick="togglePanel('preview-frame-container')" class="action-btn" id="btn-preview" title="Toggle Preview Pane">
+                <button onclick="togglePanel('preview-frame-container')" class="action-btn active" id="btn-preview" title="Toggle Preview Pane">
                     <i data-lucide="layout-template"></i> 
                     <span>Preview</span>
                 </button>
-                <button onclick="togglePanel('terminal-pane')" class="action-btn" id="btn-terminal" title="Toggle Terminal">
+                <button onclick="togglePanel('terminal-pane')" class="action-btn active" id="btn-terminal" title="Toggle Terminal">
                     <i data-lucide="terminal"></i> 
                     <span>Terminal</span>
                 </button>
@@ -92,8 +92,8 @@
                     <header class="explorer-header">
                         <span class="explorer-title">EXPLORER</span>
                         <div class="explorer-actions">
-                            <i data-lucide="file-plus" class="add-btn" onclick="addNewItem('file')" title="New File"></i>
-                            <i data-lucide="folder-plus" class="add-btn" onclick="addNewItem('folder')" title="New Folder"></i>
+                            <i data-lucide="file-plus" class="add-btn" onclick="addNewRootItem('file')" title="New File in Root"></i>
+                            <i data-lucide="folder-plus" class="add-btn" onclick="addNewRootItem('folder')" title="New Folder in Root"></i>
                             <i data-lucide="refresh-cw" class="add-btn" onclick="renderTree()" title="Refresh Tree"></i>
                         </div>
                     </header>
@@ -111,7 +111,7 @@
                         <div class="tab-bar" id="tab-bar">
                             <div class="tab active">
                                 <i data-lucide="file-code" class="tab-icon"></i>
-                                <span id="current-tab-name">No File Open</span>
+                                <span id="current-tab-name">index.html</span>
                             </div>
                         </div>
                         <div id="monaco-editor"></div>
@@ -159,7 +159,7 @@
         <footer class="status-bar">
             <div class="status-left">
                 <span class="status-item"><i data-lucide="check-circle-2"></i> Ready</span>
-                <span class="status-item" id="active-lang-status">Plain Text</span>
+                <span class="status-item" id="active-lang-status">HTML</span>
             </div>
             <div class="status-right">
                 <span class="status-item">UTF-8</span>
