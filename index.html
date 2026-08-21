@@ -1,91 +1,228 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeFlow Live | Pro3</title>
-    <link rel="stylesheet" href="style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeFlow Live | Pro3 Cloud IDE</title>
+    <!-- Google Fonts for UI & Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.1.0/css/xterm.css">
+    <!-- Xterm Terminal CSS & JS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/xterm@5.1.0/css/xterm.css"
+    />
     <script src="https://cdn.jsdelivr.net/npm/xterm@5.1.0/lib/xterm.js"></script>
+    <!-- Monaco Editor Loader -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.min.js"></script>
-</head>
-<body class="dark-theme"> 
+  </head>
+  <body class="dark-theme">
     <div class="repl-container">
-        <nav class="navbar">
-            <div class="nav-left">
-                <i data-lucide="layers" class="logo"></i>
-                <span class="project-name">Cloud-Editor-V5</span>
-            </div>
-            <div class="nav-center">
-                <button class="run-btn" onclick="executeCode()">
-                    <i data-lucide="play"></i> Run
-                </button>
-            </div>
-            <div class="nav-right">
-                <button onclick="togglePanel('preview-frame-container')" class="action-btn">
-                    <i data-lucide="layout"></i> Preview
-                </button>
-                <button onclick="togglePanel('terminal-pane')" class="action-btn">
-                    <i data-lucide="terminal"></i> Terminal
-                </button>
-                <button onclick="toggleTheme()" class="action-btn theme-btn">
-                    <i data-lucide="sun" id="theme-icon"></i>
-                </button>
-                <button onclick="downloadCurrentFile()" class="action-btn download-btn">
-                    <i data-lucide="download"></i> Download
-                </button>
-                <!-- <div class="user-avatar">M</div> -->
-            </div>
-        </nav>
-
-        <div class="repl-workspace">
-            <aside class="activity-bar">
-                <i data-lucide="files" id="toggle-sidebar" class="active-icon"></i>
-                <i data-lucide="search"></i>
-                <i data-lucide="settings"></i>
-            </aside>
-
-            <div class="sidebar" id="sidebar">
-                <div class="file-explorer">
-                    <header>
-                        <span>FILES</span>
-                        <i data-lucide="file-plus" class="add-btn" onclick="addNewFile()" title="New File"></i>
-                    </header>
-                    <div id="file-tree" class="tree"></div>
-                </div>
-            </div>
-
-            <div class="resizer horizontal" id="resizer-side"></div>
-
-            <main class="main-content">
-                <div class="top-row">
-                    <section class="editor-area">
-                        <div class="tab-bar">
-                            <div class="tab active">
-                                <span id="current-tab-name">No File Open</span>
-                            </div>
-                        </div>
-                        <div id="monaco-editor"></div>
-                    </section>
-                    
-                    <div class="resizer horizontal" id="resizer-main"></div>
-
-                    <section class="output-area" id="preview-frame-container">
-                        <div class="pane-header">WEBVIEW <i data-lucide="refresh-cw" onclick="executeCode()" class="refresh-icon"></i></div>
-                        <iframe id="preview-frame" sandbox="allow-scripts"></iframe>
-                    </section>
-                </div>
-
-                <div class="resizer vertical" id="resizer-term"></div>
-
-                <section class="terminal-pane" id="terminal-pane">
-                    <div class="pane-header">SHELL</div>
-                    <div id="terminal-container"></div>
-                </section>
-            </main>
+      <!-- Top Navigation Bar -->
+      <nav class="navbar">
+        <div class="nav-left">
+          <div class="logo-wrapper">
+            <i data-lucide="code-2" class="logo-icon"></i>
+          </div>
+          <div class="project-info">
+            <span class="project-name">CodeFlow Live</span>
+            <span class="version-badge">v5.0 Pro</span>
+          </div>
         </div>
+
+        <div class="nav-center">
+          <button
+            class="run-btn"
+            onclick="executeCode()"
+            title="Run Code (Ctrl + Enter)"
+          >
+            <i data-lucide="play" class="btn-icon"></i>
+            <span>Run Project</span>
+          </button>
+        </div>
+
+        <div class="nav-right">
+          <button
+            onclick="togglePanel('preview-frame-container')"
+            class="action-btn"
+            id="btn-preview"
+            title="Toggle Preview Pane"
+          >
+            <i data-lucide="layout-template"></i>
+            <span>Preview</span>
+          </button>
+          <button
+            onclick="togglePanel('terminal-pane')"
+            class="action-btn"
+            id="btn-terminal"
+            title="Toggle Terminal"
+          >
+            <i data-lucide="terminal"></i>
+            <span>Terminal</span>
+          </button>
+          <div class="divider-v"></div>
+          <button
+            onclick="toggleTheme()"
+            class="action-btn theme-btn"
+            id="theme-toggle-btn"
+            title="Switch Theme"
+          >
+            <i data-lucide="sun" id="theme-icon"></i>
+          </button>
+          <button
+            onclick="downloadCurrentFile()"
+            class="action-btn download-btn"
+            title="Download Active File"
+          >
+            <i data-lucide="download"></i>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Main Workspace Body -->
+      <div class="repl-workspace">
+        <!-- Left Activity Sidebar Icon Bar -->
+        <aside class="activity-bar">
+          <div class="act-group-top">
+            <button
+              class="act-icon active"
+              id="toggle-sidebar"
+              title="File Explorer"
+            >
+              <i data-lucide="files"></i>
+            </button>
+            <button class="act-icon" title="Search Workspace">
+              <i data-lucide="search"></i>
+            </button>
+            <button class="act-icon" title="Source Control">
+              <i data-lucide="git-branch"></i>
+            </button>
+          </div>
+          <div class="act-group-bottom">
+            <button class="act-icon" title="Settings">
+              <i data-lucide="settings"></i>
+            </button>
+          </div>
+        </aside>
+
+        <!-- File Explorer Sidebar -->
+        <div class="sidebar" id="sidebar">
+          <div class="file-explorer">
+            <header class="explorer-header">
+              <span class="explorer-title">PROJECT FILES</span>
+              <div class="explorer-actions">
+                <i
+                  data-lucide="file-plus"
+                  class="add-btn"
+                  onclick="addNewFile()"
+                  title="Create New File"
+                ></i>
+                <i
+                  data-lucide="refresh-cw"
+                  class="add-btn"
+                  onclick="renderTree()"
+                  title="Refresh Tree"
+                ></i>
+              </div>
+            </header>
+            <div id="file-tree" class="tree-list"></div>
+          </div>
+        </div>
+
+        <div class="resizer horizontal" id="resizer-side"></div>
+
+        <!-- Main Code Area & Webview Output -->
+        <main class="main-content">
+          <div class="top-row">
+            <!-- Monaco Code Editor Area -->
+            <section class="editor-area">
+              <div class="tab-bar" id="tab-bar">
+                <div class="tab active">
+                  <i data-lucide="file-code" class="tab-icon"></i>
+                  <span id="current-tab-name">No File Open</span>
+                </div>
+              </div>
+              <div id="monaco-editor"></div>
+            </section>
+
+            <div class="resizer horizontal" id="resizer-main"></div>
+
+            <!-- Webview Preview Panel -->
+            <section class="output-area" id="preview-frame-container">
+              <div class="pane-header">
+                <div class="pane-title">
+                  <i data-lucide="globe"></i>
+                  <span>LIVE PREVIEW</span>
+                </div>
+                <div class="pane-controls">
+                  <i
+                    data-lucide="rotate-cw"
+                    onclick="refreshPreview()"
+                    class="pane-action-icon"
+                    title="Reload Webview"
+                  ></i>
+                  <i
+                    data-lucide="external-link"
+                    onclick="openPreviewNewTab()"
+                    class="pane-action-icon"
+                    title="Open in New Tab"
+                  ></i>
+                </div>
+              </div>
+              <div class="iframe-wrapper">
+                <iframe
+                  id="preview-frame"
+                  sandbox="allow-scripts allow-modals allow-same-origin"
+                ></iframe>
+              </div>
+            </section>
+          </div>
+
+          <div class="resizer vertical" id="resizer-term"></div>
+
+          <!-- Integrated Shell Terminal -->
+          <section class="terminal-pane" id="terminal-pane">
+            <div class="pane-header">
+              <div class="pane-title">
+                <i data-lucide="terminal"></i>
+                <span>DEVELOPER SHELL</span>
+              </div>
+              <div class="pane-controls">
+                <i
+                  data-lucide="trash-2"
+                  onclick="clearTerminal()"
+                  class="pane-action-icon"
+                  title="Clear Console"
+                ></i>
+              </div>
+            </div>
+            <div id="terminal-container"></div>
+          </section>
+        </main>
+      </div>
+
+      <!-- Footer Status Bar -->
+      <footer class="status-bar">
+        <div class="status-left">
+          <span class="status-item"
+            ><i data-lucide="check-circle-2"></i> Ready</span
+          >
+          <span class="status-item" id="active-lang-status">Plain Text</span>
+        </div>
+        <div class="status-right">
+          <span class="status-item">UTF-8</span>
+          <span class="status-item">Spaces: 4</span>
+        </div>
+      </footer>
     </div>
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
