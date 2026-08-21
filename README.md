@@ -1,63 +1,45 @@
-# 💻 Cloud-Powered Web Code Editor
+# 💻 CodeFlow Live | Pro3 Cloud IDE
 
-A fast, lightweight, and modern web-based **Live Code Editor** built using **React** and the **Monaco Editor Framework**. This editor is specifically designed to write, manage, and preview **HTML, CSS, and JavaScript** structures in real-time.
+A fast, lightweight, and modern browser-based **Cloud IDE & Live Code Workspace** built with a **VS Code / Cursor-inspired Aesthetic**. Write, manage, and preview **HTML, CSS, JavaScript, and Python** in real-time with an integrated shell terminal and dynamic theme sync engine.
 
 ---
 
 ## ⚡ Cloud-Powered Architecture
 
-This project is completely serverless and lightweight. Instead of heavy local packages, all critical assets are fetched directly from the cloud:
+This IDE is serverless, fast, and completely lightweight. All core assets are fetched directly from the cloud:
 
-- **Zero-Local Dependencies:** Monaco Editor core logic is bundled and streamed directly via CDN.
-- **Cloud Icons & Fonts:** All file tree and UI icons are loaded dynamically through online icon packs (Devicons/FontAwesome).
-- **Instant Load:** No heavy background compilation; your browser handles the execution instantly.
+- **Zero-Local Heavy Dependencies:** Monaco Editor core engine streamed directly via CDN.
+- **Dynamic Icons & Fonts:** Modern vector icon set via Lucide Icons and developer-grade typography with `JetBrains Mono` & `Inter`.
+- **Browser Execution:** Direct client-side rendering with instant Webview isolated previews.
 
 ---
 
-## 🚀 Features
+## 🚀 Key Features & Upgrades (v5.0 Pro)
 
-- **Front-End Stack Focus:** Seamless tab switching between `index.html`, `style.css`, and `script.js` files.
-- **VS Code Power in Browser:** Powered by Monaco Editor, providing syntax highlighting, auto-closing brackets, and smart IntelliSense.
-- **Live Interactive Preview:** An integrated, secure iframe panel that renders your HTML/CSS/JS code changes instantly as you type.
-- **File Tree Management:** A clean, sidebar navigation UI to switch between your frontend files.
-- **Sleek Dark/Light UI:** Minimalist coding environment with built-in theme toggling.
+- **VS Code / Cursor Aesthetic UI:** Re-designed layout featuring high-contrast Obsidian Dark (`#090d16`) and Clean Slate Light (`#f8fafc`) theme engines.
+- **Dynamic Theme Synchronizer:** 1-Click dark/light toggle that automatically syncs the UI, Monaco Editor (`vs-dark` $\leftrightarrow$ `vs`), and Xterm.js Terminal background instantly.
+- **Monaco Editor Core:** Powered by VS Code's editor engine with syntax highlighting, smooth cursor animations, auto-closing brackets, and language auto-detection.
+- **Live Webview & Popout Preview:** Embedded sandbox preview pane with 1-click refresh and single-click "Open in New Tab" capabilities.
+- **Integrated Terminal Shell:** Interactive Xterm.js terminal panel for live execution logging and system events.
+- **File Explorer Management:** Complete file tree interface supporting interactive file creation, dynamic file-type icon badges, and file deletion.
+- **Collapsible Workspace Panels:** Adjustable and toggleable sidebars, preview frame, and shell terminal with drag-to-resize support.
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **React.js:** For building the interactive UI components and managing application state.
-- **Monaco Editor (`@monaco-editor/react`):** The cloud-streamed code editor engine.
-- **HTML5, CSS3, JavaScript (ES6):** The target languages managed inside the editor workspace.
+- **Frontend Core:** HTML5, Modern CSS3 (Custom Design System & CSS Variables), JavaScript (ES6)
+- **Editor Engine:** Monaco Editor (`monaco-editor`)
+- **Terminal Engine:** Xterm.js (`xterm.css` / `xterm.js`)
+- **Icons & Typography:** Lucide Icons, Google Fonts (`Inter`, `JetBrains Mono`)
 
 ---
 
-## 📸 Demo
-
-![Code Editor Preview](editor-preview.png)
-
----
-
-## 📂 Project Workspace Structure
+## 📂 Project Structure
 
 ```text
-├── src/
-│   ├── components/    # Sidebar, Editor Workspace, and Live Preview Iframe
-│   ├── App.js         # Main layout aggregator and state manager
-│   └── index.js       # React root configuration
-├── public/            # Static wrappers
-└── package.json       # App configuration
-```
-
----
-
-### 💻 3. CodeFlow-Live
-
-## 🚀 How to Run Locally
-
-### 1. Clone and Enter the Repository
-
-```bash
-git clone [https://github.com/amirsohail100/CodeFlow-Live.git](https://github.com/amirsohail100/CodeFlow-Live.git)
-cd CodeFlow-Live
+├── index.html        # Main IDE UI layout & navbar structure
+├── style.css         # Design system, CSS variables & theme tokens
+├── script.js        # Monaco initialization, theme switcher & workspace logic
+└── README.md         # Comprehensive project documentation
 ```
