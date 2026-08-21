@@ -1,6 +1,7 @@
 let editor, terminal, currentFilePath = "index.html";
+let openTabs = ["index.html"];
 
-// Clean baseline file structure without unnecessary dummy folders/files
+// Clean baseline file structure
 let fileSystem = {
     "index.html": {
         type: "file",
@@ -50,6 +51,8 @@ function initApp() {
     initInteractiveTerminal();
     setupResizers();
     renderTree();
+    renderTabs();
+    updateBreadcrumbs("index.html");
     refreshPreview();
     lucide.createIcons();
 
@@ -96,8 +99,19 @@ function togglePanel(panelId) {
 }
 
 /* ==========================================================================
-   File System Utilities
+   File System Utilities & Dynamic File Icons
    ========================================================================== */
+
+function getFileIcon(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    if (ext === 'html') return { icon: 'file-code', class: 'html-icon' };
+    if (ext === 'css') return { icon: 'palette', class: 'css-icon' };
+    if (ext === 'js') return { icon: 'file-json', class: 'js-icon' };
+    if (ext === 'json') return { icon: 'file-type-2', class: 'json-icon' };
+    if (ext === 'py') return { icon: 'terminal', class: 'py-icon' };
+    if (ext === 'md') return { icon: 'file-text', class: 'md-icon' };
+    return { icon: 'file-code', class: 'default-icon' };
+}
 
 function getItemByPath(pathStr) {
     if (!pathStr) return null;
@@ -141,6 +155,67 @@ function deleteItemByPath(pathStr) {
 }
 
 /* ==========================================================================
+   Multi-Tab System & Breadcrumb Handlers
+   ========================================================================== */
+
+function renderTabs() {
+    const tabBar = document.getElementById('tab-bar');
+    if (!tabBar) return;
+    tabBar.innerHTML = "";
+
+    openTabs.forEach(filePath => {
+        const fileName = filePath.split('/').pop();
+        const iconInfo = getFileIcon(fileName);
+        const isActive = filePath === currentFilePath;
+
+        const tabDiv = document.createElement('div');
+        tabDiv.className = `tab ${isActive ? 'active' : ''}`;
+        tabDiv.onclick = () => switchFile(filePath);
+
+        tabDiv.innerHTML = `
+            <i data-lucide="${iconInfo.icon}" class="tab-icon ${iconInfo.class}"></i>
+            <span class="tab-name">${fileName}</span>
+            <i data-lucide="x" class="tab-close" onclick="closeTab(event, '${filePath}')" title="Close Tab"></i>
+        `;
+
+        tabBar.appendChild(tabDiv);
+    });
+
+    lucide.createIcons();
+}
+
+function closeTab(event, pathStr) {
+    if (event) event.stopPropagation();
+    openTabs = openTabs.filter(p => p !== pathStr);
+
+    if (currentFilePath === pathStr) {
+        if (openTabs.length > 0) {
+            switchFile(openTabs[openTabs.length - 1]);
+        } else {
+            currentFilePath = null;
+            if (editor) editor.setValue("// No file open");
+            updateBreadcrumbs(null);
+            renderTabs();
+        }
+    } else {
+        renderTabs();
+    }
+}
+
+function updateBreadcrumbs(pathStr) {
+    const bcPath = document.getElementById('breadcrumb-path');
+    if (!bcPath) return;
+
+    if (!pathStr) {
+        bcPath.innerText = "No File Open";
+        return;
+    }
+
+    const parts = pathStr.split('/');
+    bcPath.innerHTML = parts.map(p => `<span class="bc-item">${p}</span>`).join(' <span class="bc-sep">&gt;</span> ');
+}
+
+/* ==========================================================================
    Recursive File Explorer Tree Renderer
    ========================================================================== */
 
@@ -158,15 +233,11 @@ function renderTree() {
 
             if (item.type === 'file') {
                 nodeDiv.className = `tree-node ${fullPath === currentFilePath ? 'active-file' : ''}`;
-                
-                let iconName = "file-code";
-                if (key.endsWith('.html')) iconName = "file-type-2";
-                else if (key.endsWith('.css')) iconName = "palette";
-                else if (key.endsWith('.js')) iconName = "file-json";
+                const iconInfo = getFileIcon(key);
 
                 nodeDiv.innerHTML = `
                     <div class="tree-node-left">
-                        <i data-lucide="${iconName}"></i>
+                        <i data-lucide="${iconInfo.icon}" class="${iconInfo.class}"></i>
                         <span>${key}</span>
                     </div>
                     <div class="tree-node-actions">
@@ -263,11 +334,7 @@ function deleteTreeItem(event, pathStr) {
     if (event) event.stopPropagation();
     if (confirm(`Delete ${pathStr}?`)) {
         deleteItemByPath(pathStr);
-        if (currentFilePath === pathStr) {
-            currentFilePath = null;
-            editor.setValue("// Select or create a file");
-            document.getElementById('current-tab-name').innerText = "No File Open";
-        }
+        closeTab(null, pathStr);
         renderTree();
     }
 }
@@ -276,16 +343,25 @@ function switchFile(pathStr) {
     const item = getItemByPath(pathStr);
     if (!item || item.type !== 'file') return;
 
+    if (!openTabs.includes(pathStr)) {
+        openTabs.push(pathStr);
+    }
+
     currentFilePath = pathStr;
     const ext = pathStr.split('.').pop().toLowerCase();
-    const langMap = { html: 'html', css: 'css', js: 'javascript', py: 'python', json: 'json' };
+    const langMap = { html: 'html', css: 'css', js: 'javascript', py: 'python', json: 'json', md: 'markdown' };
     const langName = langMap[ext] || 'plaintext';
 
-    monaco.editor.setModelLanguage(editor.getModel(), langName);
-    editor.setValue(item.content);
+    if (editor) {
+        monaco.editor.setModelLanguage(editor.getModel(), langName);
+        editor.setValue(item.content);
+    }
 
-    document.getElementById('current-tab-name').innerText = pathStr;
-    document.getElementById('active-lang-status').innerText = langName.toUpperCase();
+    const langStatus = document.getElementById('active-lang-status');
+    if (langStatus) langStatus.innerText = langName.toUpperCase();
+
+    renderTabs();
+    updateBreadcrumbs(pathStr);
     renderTree();
 }
 
